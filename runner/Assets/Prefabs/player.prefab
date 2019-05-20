@@ -23,8 +23,7 @@ GameObject:
   - component: {fileID: 50658972138666826}
   - component: {fileID: 61626994247751106}
   - component: {fileID: 114032465329517922}
-  - component: {fileID: 114886537199752796}
-  - component: {fileID: 114305680241584928}
+  - component: {fileID: 95189963349334730}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -38,9 +37,9 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1646424915232980}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.73, z: 0}
-  m_LocalScale: {x: 0.5, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -77,19 +76,37 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.050407007, y: 0}
+  m_Offset: {x: 0.29021132, y: 0.7}
   m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    border: {x: 0.17750001, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 2.2833335, y: 1.6666667}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.0312316, y: 1}
+  m_Size: {x: 0.9224198, y: 1.3015218}
   m_EdgeRadius: 0
+--- !u!95 &95189963349334730
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1646424915232980}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: dc6b5aa9b5c656949a58428071e83875, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114032465329517922
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -107,10 +124,10 @@ MonoBehaviour:
   hitWall: 0
   hitObstacle: 0
   hitGoal: 0
-  jumpForce: 20
-  extraJumpsValue: 1
+  jumpForce: 21
+  extraJumpsValue: 0
   fallMultiplier: 8
-  lowJumpMultiplier: 7
+  lowJumpMultiplier: 10
   whatIsGround:
     serializedVersion: 2
     m_Bits: 256
@@ -120,73 +137,6 @@ MonoBehaviour:
   whatIsObstacle:
     serializedVersion: 2
     m_Bits: 1024
---- !u!114 &114305680241584928
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1646424915232980}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5428a1c2c89852a4b9fe71f2288fdc24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currHealth: 4
-  maxHealth: 4
-  hearts:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  fullHeart: {fileID: 21300000, guid: 0a91a62d5ede5894abdb9e2a57e3d234, type: 3}
---- !u!114 &114886537199752796
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1646424915232980}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd438dd108a0f284aa931a2da434f1d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ImpulseDefinition:
-    m_ImpulseChannel: 1
-    m_RawSignal: {fileID: 11400000, guid: 0011ab672e777a748a494a66d0e4d955, type: 2}
-    m_AmplitudeGain: 0.1
-    m_FrequencyGain: 1
-    m_RepeatMode: 0
-    m_Randomize: 0
-    m_TimeEnvelope:
-      m_AttackShape:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      m_DecayShape:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      m_AttackTime: 0
-      m_SustainTime: 0.08
-      m_DecayTime: 0
-      m_ScaleWithImpact: 1
-      m_HoldForever: 0
-    m_ImpactRadius: 10
-    m_DirectionMode: 0
-    m_DissipationMode: 2
-    m_DissipationDistance: 1000
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 256
-  m_IgnoreTag: 
-  m_UseImpactDirection: 0
-  m_ScaleImpactWithMass: 0
-  m_ScaleImpactWithSpeed: 1
 --- !u!212 &212060562751425014
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -222,8 +172,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0a91a62d5ede5894abdb9e2a57e3d234, type: 3}
-  m_Color: {r: 1, g: 0.7666349, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 18cbcff7417549e4e9cb7a70fed29405, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

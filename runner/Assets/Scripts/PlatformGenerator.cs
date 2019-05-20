@@ -9,13 +9,17 @@ public class PlatformGenerator : MonoBehaviour {
     public GameObject       platformBase;
     public GameObject       perfectZone;
 
+    public GameObject       basicBuilding_S;
+
     public GameObject       obstacle;
+    public GameObject       slideUnder;
+    public GameObject       roofHouse;
     public GameObject       goal;
 
     public Transform        generationPoint;
     public float            initialDistanceBetween;
-    public static float     minWidth = 5; 
-    public static float     maxWidth = 16;
+    private static float    singleWidth = 6;
+    private static float    defaultWidth = 2*singleWidth;
     public int              stageLength;
 
     private float           gameSpeedMultiplier = 1;
@@ -24,14 +28,17 @@ public class PlatformGenerator : MonoBehaviour {
  
     public enum PlatformType
     {
-        BASIC,
-        MINI,
+        SS_BASIC_S,
+        SS_BASIC_M,
+        SS_BASIC_L,
+        SS_BASIC_XL,
         TUNNEL
     }
     public enum ObstacleType
     {
         JUMP_OVER,
-        DUCK_UNDER
+        SLIDE_UNDER,
+        ROOF_HOUSE
     }
 
     public class Obstacle
@@ -46,10 +53,39 @@ public class PlatformGenerator : MonoBehaviour {
             oType = ObstacleType.JUMP_OVER;
             oBody = Instantiate(instance.obstacle, parent.pos + new Vector2(0,1), Quaternion.identity);
         }
-        public Obstacle(Platform parent, ObstacleType ot)
+        public Obstacle(Platform parent, int position)
+        {
+            parentPlat = parent;
+            oType = ObstacleType.JUMP_OVER;
+            oBody = Instantiate(instance.obstacle, parent.pos + new Vector2((position*singleWidth) - (parent.width/2), 1), Quaternion.identity);
+
+
+        }
+        public Obstacle(Platform parent, int position, ObstacleType ot)
         {
             parentPlat = parent;
             oType = ot;
+
+            switch (oType)
+            {
+                case ObstacleType.JUMP_OVER:
+                    oBody = Instantiate(instance.obstacle, parent.pos + new Vector2((position * singleWidth) - (parent.width / 2), 1), Quaternion.identity);
+                    break;
+
+                case ObstacleType.SLIDE_UNDER:
+                    oBody = Instantiate(instance.slideUnder, parent.pos + new Vector2((position * singleWidth) - (parent.width / 2), 3), Quaternion.identity);
+                    break;
+
+                case ObstacleType.ROOF_HOUSE:
+                    oBody = Instantiate(instance.roofHouse, parent.pos + new Vector2((position * singleWidth) + (singleWidth/2) - (parent.width / 2), 2), Quaternion.identity);
+                    oBody.transform.localScale = new Vector3(singleWidth, 1, 1);
+
+                    break;
+
+                default:
+                    oBody = Instantiate(instance.obstacle, parent.pos + new Vector2((position * singleWidth) - (parent.width / 2), 1), Quaternion.identity);
+                    break;
+            }
         }
     }
 
@@ -66,16 +102,17 @@ public class PlatformGenerator : MonoBehaviour {
 
         public List<Obstacle>   hazards = new List<Obstacle>();
 
-        public Platform(Vector2 inP, float inWid, PlatformType inTyp)
+        public Platform(Vector2 inP, PlatformType inTyp)
         {
             pType = inTyp;
             pos = inP;
-            width = inWid;
 
             switch (pType)
             {
 
-                case PlatformType.BASIC:
+                case PlatformType.SS_BASIC_S:
+                    width = singleWidth;
+
                     pGround = Instantiate(instance.platform, pos, Quaternion.identity);
                     pGround.transform.localScale = new Vector3(width, 1, 1);
                     pGround.GetComponent<PlayerLand>().SetParent(this);
@@ -87,8 +124,36 @@ public class PlatformGenerator : MonoBehaviour {
                     perfZone.GetComponent<PerfectZone>().SetParent(this);
                     break;
 
-                case PlatformType.MINI:
-                    width = minWidth;
+                case PlatformType.SS_BASIC_M:
+                    width = defaultWidth;
+
+                    pGround = Instantiate(instance.platform, pos, Quaternion.identity);
+                    pGround.transform.localScale = new Vector3(width, 1, 1);
+                    pGround.GetComponent<PlayerLand>().SetParent(this);
+
+                    pBase = Instantiate(instance.platformBase, pos + new Vector2(0, -25), Quaternion.identity);
+                    pBase.transform.localScale = new Vector3(width, 50, 1);
+
+                    perfZone = Instantiate(instance.perfectZone, pos + new Vector2(-width / 2 + 0.4f, 0.5f), Quaternion.identity);
+                    perfZone.GetComponent<PerfectZone>().SetParent(this);
+                    break;
+
+                case PlatformType.SS_BASIC_L:
+                    width = defaultWidth + singleWidth;
+
+                    pGround = Instantiate(instance.platform, pos, Quaternion.identity);
+                    pGround.transform.localScale = new Vector3(width, 1, 1);
+                    pGround.GetComponent<PlayerLand>().SetParent(this);
+
+                    pBase = Instantiate(instance.platformBase, pos + new Vector2(0, -25), Quaternion.identity);
+                    pBase.transform.localScale = new Vector3(width, 50, 1);
+
+                    perfZone = Instantiate(instance.perfectZone, pos + new Vector2(-width / 2 + 0.4f, 0.5f), Quaternion.identity);
+                    perfZone.GetComponent<PerfectZone>().SetParent(this);
+                    break;
+
+                case PlatformType.SS_BASIC_XL:
+                    width = defaultWidth * 2;
 
                     pGround = Instantiate(instance.platform, pos, Quaternion.identity);
                     pGround.transform.localScale = new Vector3(width, 1, 1);
@@ -102,6 +167,8 @@ public class PlatformGenerator : MonoBehaviour {
                     break;
 
                 default:
+                    width = defaultWidth;
+
                     pGround = Instantiate(instance.platform, pos, Quaternion.identity);
                     pGround.transform.localScale = new Vector3(width, 1, 1);
                     pGround.GetComponent<PlayerLand>().SetParent(this);
@@ -114,23 +181,6 @@ public class PlatformGenerator : MonoBehaviour {
                     break;
             }
         
-        }
-        public Platform(Vector2 inP, float inWid)
-        {
-            pos = inP;
-            width = inWid;
-            pType = PlatformType.BASIC;
-
-            pGround = Instantiate(instance.platform, pos, Quaternion.identity);
-            pGround.transform.localScale = new Vector3(inWid, 1, 1);
-            pGround.GetComponent<PlayerLand>().SetParent(this);
-
-            pBase = Instantiate(instance.platformBase, pos + new Vector2(0, -25), Quaternion.identity);
-            pBase.transform.localScale = new Vector3(inWid, 50, 1);
-
-            perfZone = Instantiate(instance.perfectZone, pos + new Vector2(-width / 2 + 0.4f, 0.5f), Quaternion.identity);
-            perfZone.GetComponent<PerfectZone>().SetParent(this);
-
         }
     }
 
@@ -151,29 +201,25 @@ public class PlatformGenerator : MonoBehaviour {
 
     void Start () {
         //Initialize, add starting platform
-        platforms.Add(new Platform(new Vector2(6, -1), 20));
+        platforms.Add(new Platform(new Vector2(6, -1), PlatformType.SS_BASIC_XL));
         transform.position = new Vector2(platforms[0].pos.x, transform.position.y);
     }
 
     void Update () {
-        if(transform.position.x < generationPoint.position.x)
+        if(transform.position.x < generationPoint.position.x && platformsThisLevel < stageLength)
         {
             Platform lastPlat = platforms[platforms.Count - 1];
 
             PlatformType t = (PlatformType)Random.Range(0, System.Enum.GetValues(typeof(PlatformType)).Length);
 
-            float newWidth = Mathf.Floor(Random.Range(minWidth + 1, maxWidth)); 
-            if(t == PlatformType.MINI)
-            {
-                newWidth = minWidth;
-            }
+            float newWidth = GetWidthOfType(t);
             float newHeight = Mathf.Floor(Random.Range(lastPlat.pos.y - 4, lastPlat.pos.y + 4f));
             float newDistBetween = gameSpeedMultiplier * Mathf.Floor(Random.Range(initialDistanceBetween, initialDistanceBetween * 2.1f));
 
             //New platform will be reachable from last platform
             transform.position = new Vector2(transform.position.x + (lastPlat.width/2) + newWidth/2 + newDistBetween, newHeight);
 
-            platforms.Add(new Platform(transform.position, newWidth, t));
+            platforms.Add(new Platform(transform.position, t));
             platformsThisLevel += 1;
 
             if (platformsThisLevel >= stageLength)
@@ -183,20 +229,26 @@ public class PlatformGenerator : MonoBehaviour {
             }
             else
             {
-                int rn = Random.Range(1, 100);
-                if (rn <= chanceOfObstacle)
+                for(int i=1; i < platforms[platforms.Count - 1].width / singleWidth; i++)
                 {
-                    //add obstacle
-                    if (platforms[platforms.Count - 1].pType != PlatformType.MINI)
+                    int rn = Random.Range(1, 100);
+                    if (rn <= chanceOfObstacle)
                     {
-                        platforms[platforms.Count - 1].hazards.Add(new Obstacle(platforms[platforms.Count - 1]));
+                        //add obstacle
+                        ObstacleType ot = (ObstacleType)Random.Range(0, System.Enum.GetValues(typeof(ObstacleType)).Length);
+                        platforms[platforms.Count - 1].hazards.Add(new Obstacle(platforms[platforms.Count - 1], i, ot));
                         chanceOfObstacle -= 5f;
+                        if(ot == ObstacleType.ROOF_HOUSE)
+                        {
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        chanceOfObstacle += 2f;
                     }
                 }
-                else
-                {
-                    chanceOfObstacle += 1;
-                }
+                
             }
         }
 
@@ -227,6 +279,32 @@ public class PlatformGenerator : MonoBehaviour {
         }
 
         return result / platforms.Count;
+    }
+
+    private float GetWidthOfType(PlatformType typ)
+    {
+        float result = 0.0f;
+
+        switch (typ)
+        {
+            case PlatformType.SS_BASIC_S:
+                result = singleWidth;
+                break;
+            case PlatformType.SS_BASIC_M:
+                result = defaultWidth;
+                break;
+            case PlatformType.SS_BASIC_L:
+                result = defaultWidth + singleWidth;
+                break;
+            case PlatformType.SS_BASIC_XL:
+                result = defaultWidth * 2;
+                break;
+            default:
+                result = defaultWidth;
+                break;
+        }
+
+        return result;
     }
 
     //Used to respawn the Player

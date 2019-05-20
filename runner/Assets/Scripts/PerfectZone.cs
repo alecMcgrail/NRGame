@@ -11,7 +11,7 @@ public class PerfectZone : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player") && parent.perfected == false)
         {
             GameController.PerfectJump();
 

@@ -26,6 +26,11 @@ public class UIManager : MonoBehaviour {
     public Image[]                  hearts;
     public Sprite                   fullHeart;
 
+    public Image[] emptyHearts;
+    public Sprite emptyHeart;
+
+    public GameObject gameOverPanel;
+
     public static UIManager         instance;
 
 	void Awake () {
@@ -56,16 +61,18 @@ public class UIManager : MonoBehaviour {
             }
             else
             {
-                hearts[i].GetComponent<Image>().color = new Color(1, 0.9f, 1);
+                hearts[i].GetComponent<Image>().color = new Color(1, 0, 0, 0);
             }
 
             if (i < PlayerController.MaximumHealth())
             {
                 hearts[i].enabled = true;
+                emptyHearts[i].enabled = true;
             }
             else
             {
                 hearts[i].enabled = false;
+                emptyHearts[i].enabled = false;
             }
         }
 
@@ -96,6 +103,11 @@ public class UIManager : MonoBehaviour {
         silverCount.text = GameController.playerCoins.y.ToString();
         goldCount.text = GameController.playerCoins.z.ToString();
         platinumCount.text = GameController.playerCoins.w.ToString();
+    }
+
+    public void ToggleGameOverScreen(bool isActive)
+    {
+        gameOverPanel.gameObject.SetActive(isActive);
     }
 
 }

@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour {
     private static bool     frozen = false;
 
     public static int       playerScore = 0;
+    private static Vector3  playerPos;
     public static Vector4   playerCoins = new Vector4(0, 0, 0, 0);
     public static Vector4   coinThresholds = new Vector4(1000, 10000, 100000, 1000000);
     public static Vector4   coinProgress = new Vector4(0, 0, 0, 0);
@@ -28,6 +29,7 @@ public class GameController : MonoBehaviour {
     private PlayerController            playerCon;
     private PlatformGenerator           platformGen;
     private UIManager                   UIMan;
+    private static ParticleManager      pMan;
 
     public CinemachineVirtualCamera     vCam;
     public static GameController        instance;
@@ -49,6 +51,7 @@ public class GameController : MonoBehaviour {
         playerCon = PlayerController.instance;
         platformGen = PlatformGenerator.instance;
         UIMan = UIManager.instance;
+        pMan = ParticleManager.instance;
 
         SetSpeedMultiplier(speedMultiplier);
         SpawnPlayer();
@@ -56,10 +59,6 @@ public class GameController : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        if(PlayerController.currHealth <= 0)
-        {
-            ToggleGameOver();
-        }
 
         //Did the Player fall or hit a wall?
         if (playerCon.transform.position.y < platformGen.AvgPlatformHeight() - 25 ||
@@ -74,27 +73,36 @@ public class GameController : MonoBehaviour {
                 SetSpeedMultiplier(1.0f);
             }
 
-            playerCon.TakeDamage(1);
-            SpawnPlayer();
+            playerCon.TakeDamage(PlayerController.CurrentHealth());
+            //SpawnPlayer();
             
         }
         else if (playerCon.hitObstacle)
         {
+            pMan.PlayEffect("HitRedSquare", playerCon.transform.position);
             playerCon.TakeDamage(1);
             playerCon.hitObstacle = false;
-            SetSpeedMultiplier(speedMultiplier - 0.08f);
-            
+            SetSpeedMultiplier(speedMultiplier - 0.1f);
+
+            perfectJumpMultiplier = 0;
         }
         else if (playerCon.hitGoal)
         {
             //Go to next level
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex );
         }
+
+        if (PlayerController.CurrentHealth() <= 0)
+        {
+            ToggleGameOver();
+        }
     }
     void Update () {
 
+        playerPos = playerCon.PlayerPosition();
+
         //Freeze in place while respawn timer counts down
-        if(respawnTimerValue > 0.0f || PlayerController.CurrentHealth() <= 0)
+        if(PlayerController.CurrentHealth() <= 0 || respawnTimerValue > 0.0f)
         { 
             respawnTimerValue -= Time.deltaTime;
         }
@@ -116,6 +124,7 @@ public class GameController : MonoBehaviour {
         p("");
         p("Perfect jump multiplier: " + perfectJumpMultiplier);
         p("Speed multiplier: " + speedMultiplier.ToString("F2"));
+        p("Vertical axis: " + Input.GetAxisRaw("Vertical").ToString("F2"));
 
 	}
 
@@ -147,10 +156,14 @@ public class GameController : MonoBehaviour {
     {
         playerCon.ToggleFreeze(true);
         frozen = true;
+        UIMan.ToggleGameOverScreen(true);
+        Invoke("ReturnToMainMenu", 3f);
+    }
+    private void ReturnToMainMenu()
+    {
         ResetScore();
         SceneManager.LoadScene(0);
     }
-
     public void p(string inS)
     {
         if (inS == "")
@@ -207,6 +220,11 @@ public class GameController : MonoBehaviour {
     {
         perfectJumpMultiplier += 1;
         AdjustScore(perfectPoints * perfectJumpMultiplier);
+
+        for (int i = 0; i < perfectJumpMultiplier; i++)
+        {
+            pMan.PlayEffect("CoinSpin", playerPos);
+        }
     }
     
 }

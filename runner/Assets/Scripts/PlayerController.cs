@@ -6,38 +6,45 @@ using UnityEngine.UI;
 //Ninja Runner Player Controller script
 
 public class PlayerController : MonoBehaviour {
-    public GameObject       player;
+    public GameObject player;
 
-    public static int       maxHealth = 3;
-    public static int       currHealth;
+    private static int maxHealth = 3;
+    private static int currHealth;
 
-    public float            baseSpeed;
-    public float            adjustedSpeed = 0.0f;
-    private float           gameSpeedMultiplier = 1;
-    private bool            isFrozen = false;
-    public bool             hitWall = false;
-    public bool             hitObstacle = false;
-    public bool             hitGoal = false;
+    public static float invulnTime = 1.5f; //time, in seconds
+    private static float invulnValue;
 
-    public float            jumpForce;
-    public int              extraJumpsValue;
-    private int             extraJumps;
+    public float baseSpeed;
+    public float adjustedSpeed = 0.0f;
+    private float gameSpeedMultiplier = 1;
+    private bool isFrozen = false;
+    public bool hitWall = false;
+    public bool hitObstacle = false;
+    public bool hitGoal = false;
+
+    public float jumpForce;
+    public int extraJumpsValue;
+    private int extraJumps;
 
     //Jump speed variables, depends on how long Jump was pressed
-    public float            fallMultiplier;
-    public float            lowJumpMultiplier;
+    public float fallMultiplier;
+    public float lowJumpMultiplier;
 
-    private bool            isGrounded;
-    public LayerMask        whatIsGround;
-    public LayerMask        whatIsWall;
-    public LayerMask        whatIsObstacle;
+    private bool isGrounded;
+    private bool wasGrounded;
+    private float fallCount = 0;
 
-    private Collider2D      col;
-    private Rigidbody2D     rb;
-    private Animator        anim;
+    public LayerMask whatIsGround;
+    public LayerMask whatIsWall;
+    public LayerMask whatIsObstacle;
 
-    private Color                       defCol;
-    public static PlayerController      instance;
+    private Collider2D col;
+    private Rigidbody2D rb;
+    private Animator anim;
+    private SpriteRenderer sRen;
+
+    private Color defCol;
+    public static PlayerController instance;
 
     private void Awake()
     {
@@ -52,13 +59,14 @@ public class PlayerController : MonoBehaviour {
     }
 
     //Initialize
-    void Start () {
+    void Start() {
         currHealth = maxHealth;
         extraJumps = extraJumpsValue;
 
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         anim = GetComponent<Animator>();
+        sRen = GetComponent<SpriteRenderer>();
 
         defCol = GetComponent<SpriteRenderer>().color;
     }
@@ -66,35 +74,42 @@ public class PlayerController : MonoBehaviour {
     private void FixedUpdate()
     {
         //Is the Player touching the ground?
-        bool wasGrounded = isGrounded;
+        wasGrounded = isGrounded;
         isGrounded = Physics2D.IsTouchingLayers(col, whatIsGround);
         hitWall = Physics2D.IsTouchingLayers(col, whatIsWall);
 
-        if(isGrounded && !wasGrounded)
-        {
-            anim.SetTrigger("Landed");
-        }
-
-        if (!isFrozen)
+        if (!isFrozen || currHealth > 0)
         {
             if (rb.velocity.x != adjustedSpeed)
             {
                 rb.velocity = new Vector2(adjustedSpeed, rb.velocity.y);
             }
         }
-  
+        UpdateAnimVariables();
+
     }
 
-    void Update () {
+    void Update() {
 
         if (currHealth > maxHealth)
         {
             currHealth = maxHealth;
         }
 
+        if (invulnValue > 0)
+        {
+            sRen.enabled = !sRen.enabled;
+            invulnValue -= Time.deltaTime;
+        }
+        else
+        {
+            sRen.enabled = true;
+            invulnValue = 0;
+        }
+
         if (!isFrozen)
         {
-
+            GetComponent<SpriteRenderer>().color = defCol;
             if (isGrounded)
             {
                 //Reset jumps
@@ -123,15 +138,77 @@ public class PlayerController : MonoBehaviour {
                 rb.velocity += Vector2.up * Physics2D.gravity * (lowJumpMultiplier - 1) * Time.deltaTime;
             }
         }
-
-        UpdateAnimVariables();
     }
 
     private void UpdateAnimVariables()
     {
-        anim.SetBool("Is Grounded", isGrounded);
-        anim.SetFloat("Y Velocity", rb.velocity.y);
+        if (isGrounded)
+        {
+            if (hitObstacle)
+            {
+                anim.SetTrigger("Rolling");
+                return;
+            }
+            if (currHealth <= 0)
+            {
+                anim.SetTrigger("Dead");
+                return;
+            }
 
+            if (!wasGrounded)
+            {
+                anim.SetTrigger("Landing");
+                if (fallCount >= 17)
+                {
+                    anim.SetTrigger("Rolling");
+                }
+                fallCount = 0;
+                return;
+            }
+            if (Input.GetButtonDown("Jump") && !isFrozen)
+            {
+                anim.SetTrigger("TakeOff");
+                return;
+            }
+        }
+        else
+        {
+            if(currHealth <= 0)
+            {
+                anim.SetTrigger("FallingDeath");
+                return;
+            }
+            if (rb.velocity.y > 3)
+            {
+                anim.SetTrigger("JumpUp");
+                return;
+            }
+            else if (rb.velocity.y < -2)
+            {
+                fallCount += 1;
+                anim.SetTrigger("Falling");
+                return;
+            }
+            else
+            {
+                anim.SetTrigger("HangTime");
+                return;
+            }
+        }
+
+        //not doing anything else, just running
+        if (isGrounded && currHealth > 0)
+        {
+            if (!isFrozen && Input.GetAxisRaw("Vertical") < -0.2f)
+            {
+                anim.SetTrigger("Slide");
+                return;
+            }
+            else
+            {
+                anim.SetTrigger("Running");
+            }
+        }
     }
 
     public void Respawn(Vector2 platPos)
@@ -152,19 +229,26 @@ public class PlayerController : MonoBehaviour {
     public void ToggleFreeze(bool inB)
     {
         isFrozen = inB;
+        rb.velocity = Vector2.Lerp(rb.velocity, new Vector3(0, rb.velocity.y, 0), 0.5f);
     }
     public float YVelocity()
     {
         return rb.velocity.y;
     }
+    public Vector3 PlayerPosition()
+    {
+        return rb.transform.position;
+    }
 
     public void TakeDamage(int amt)
     {
         currHealth -= amt;
-        if (currHealth < 0)
+        if (currHealth <= 0)
         {
             currHealth = 0;
+            return;
         }
+        invulnValue = invulnTime;
     }
     public static int CurrentHealth()
     {

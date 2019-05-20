@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: 18cbcff7417549e4e9cb7a70fed29405
+guid: 6478ba5c4dcd2de449f18deb4965cb1d
 TextureImporter:
   fileIDToRecycleName:
-    21300000: spritesheet_0
-    21300002: spritesheet_1
-    21300004: spritesheet_2
-    21300006: spritesheet_3
-    21300008: spritesheet_4
-    21300010: spritesheet_5
+    21300000: coinSpin 1_0
+    21300002: coinSpin 1_1
+    21300004: coinSpin 1_2
+    21300006: coinSpin 1_3
+    21300008: coinSpin 1_4
+    21300010: coinSpin 1_5
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -51,9 +51,9 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 1200
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 0
+  spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -90,121 +90,121 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: spritesheet_0
+      name: coinSpin 1_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 3496
-        width: 2740
-        height: 2000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 213, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1c17d5567e5ce8943a874a4d215bd910
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: spritesheet_1
-      rect:
-        serializedVersion: 2
-        x: 2990
-        y: 3490
-        width: 2740
-        height: 2000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        y: 1
+        width: 102
+        height: 99
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f04cb8b4ab5112840a05af4b4a98d7c7
+      spriteID: cf9cd3c4f80c589489e69cad492b64c2
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: spritesheet_2
+      name: coinSpin 1_1
       rect:
         serializedVersion: 2
-        x: 5980
-        y: 3490
-        width: 2740
-        height: 2000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 102
+        y: 0
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fee6816e88f18a344831d93144b12bad
+      spriteID: 61c8ffb113b186940a4531678a35ac69
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: spritesheet_3
+      name: coinSpin 1_2
       rect:
         serializedVersion: 2
-        x: 6
-        y: 500
-        width: 2740
-        height: 2000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 200
+        y: 0
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 52ca241ab085ebe48a2e8877dcdefb3f
+      spriteID: 769e4b2315e4879499164b521dfc9186
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: spritesheet_4
+      name: coinSpin 1_3
       rect:
         serializedVersion: 2
-        x: 2990
-        y: 500
-        width: 2740
-        height: 2000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 300
+        y: 0
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7a256582faac02443a308c288e9954da
+      spriteID: 7e7f783e66b74794e81db704fac6ed67
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: spritesheet_5
+      name: coinSpin 1_4
       rect:
         serializedVersion: 2
-        x: 5980
-        y: 500
-        width: 2740
-        height: 2000
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        x: 400
+        y: 0
+        width: 100
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 63e0ea400982fef4cbc65795df330a1b
+      spriteID: e3448135e7fe6b742a8a78d7bc27698a
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coinSpin 1_5
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 0
+        width: 102
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9760f97b7065bc14ebf72344d2bc417d
       vertices: []
       indices: 
       edges: []
@@ -212,7 +212,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 6d567e7206d2ff04580e6c5d3a545224
+    spriteID: 558cee30633225840bc52c7469855de5
     vertices: []
     indices: 
     edges: []
