@@ -13,6 +13,7 @@ public class PlayerLand : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            PlatformGenerator.currentPlatform = gameObject;
 
             if (!parent.perfected)
             {

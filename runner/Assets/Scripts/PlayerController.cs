@@ -11,13 +11,17 @@ public class PlayerController : MonoBehaviour {
     private static int maxHealth = 3;
     private static int currHealth;
 
+    private static int hookCount = 0;
+    private static int logCount = 0;
+
     public static float invulnTime = 1.5f; //time, in seconds
-    private static float invulnValue;
+    public static float invulnValue;
 
     public float baseSpeed;
     public float adjustedSpeed = 0.0f;
     private float gameSpeedMultiplier = 1;
     private bool isFrozen = false;
+    public bool isHooking = false;
     public bool hitWall = false;
     public bool hitObstacle = false;
     public bool hitGoal = false;
@@ -78,7 +82,7 @@ public class PlayerController : MonoBehaviour {
         isGrounded = Physics2D.IsTouchingLayers(col, whatIsGround);
         hitWall = Physics2D.IsTouchingLayers(col, whatIsWall);
 
-        if (!isFrozen || currHealth > 0)
+        if (!isFrozen && !isHooking || currHealth > 0)
         {
             if (rb.velocity.x != adjustedSpeed)
             {
@@ -103,11 +107,12 @@ public class PlayerController : MonoBehaviour {
         }
         else
         {
+            //hitObstacle = false;
             sRen.enabled = true;
             invulnValue = 0;
         }
 
-        if (!isFrozen)
+        if (!isFrozen && !isHooking)
         {
             GetComponent<SpriteRenderer>().color = defCol;
             if (isGrounded)
@@ -217,15 +222,35 @@ public class PlayerController : MonoBehaviour {
         transform.position = new Vector2(platPos.x - 1, platPos.y + 1);
     }
 
+    public IEnumerator HookToCoroutine(Vector3 target)
+    {
+        float ogScale = rb.gravityScale;
+
+        isHooking = true;
+        col.enabled = false;
+        rb.velocity = Vector3.zero;
+        rb.gravityScale = 0;
+
+        Debug.DrawLine(transform.position, target, Color.yellow);
+        Debug.Log(Vector3.Distance(transform.position, target));
+        //Debug.Break();
+      
+        while (transform.position.y < target.y - 1f)
+        {
+            transform.position = Vector3.Lerp(transform.position, target, 7f * Time.deltaTime);
+            yield return null;
+        }
+
+        isHooking = false;
+        col.enabled = true;
+        rb.gravityScale = ogScale;
+    }
+
     public void UpdateMultiplier(float inMult)
     {
         gameSpeedMultiplier = inMult;
     }
 
-    public void ToggleFreeze()
-    {
-        isFrozen = !isFrozen;
-    }
     public void ToggleFreeze(bool inB)
     {
         isFrozen = inB;
@@ -250,13 +275,25 @@ public class PlayerController : MonoBehaviour {
         }
         invulnValue = invulnTime;
     }
-    public static int CurrentHealth()
+    public static int GetCurrentHealth()
     {
         return currHealth;
     }
-    public static int MaximumHealth()
+    public static int GetMaximumHealth()
     {
         return maxHealth;
+    }
+    public static int GetHookCount()
+    {
+        return hookCount;
+    }
+    public static void SetHookCount(int n)
+    {
+        hookCount = n;
+    }
+    public static int GetLogCount()
+    {
+        return logCount;
     }
 
     public void OnCollisionEnter2D(Collision2D collision)
@@ -264,8 +301,11 @@ public class PlayerController : MonoBehaviour {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
         {
             collision.collider.enabled = false;
-            collision.gameObject.SetActive(false);
-            hitObstacle = true;
+            if (invulnValue <= 0)
+            {
+                collision.gameObject.SetActive(false);
+                hitObstacle = true;
+            }
         }
         if (collision.gameObject.CompareTag("Finish"))
         {

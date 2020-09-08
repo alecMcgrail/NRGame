@@ -23,6 +23,12 @@ public class UIManager : MonoBehaviour {
     public UnityEngine.UI.Image     goldFront;
     public UnityEngine.UI.Image     platinumFront;
 
+    public UnityEngine.UI.Image     hookIcon;
+    public TextMeshProUGUI          hookCount;
+
+    public UnityEngine.UI.Image     logIcon;
+    public TextMeshProUGUI          logCount;
+
     public Image[]                  hearts;
     public Sprite                   fullHeart;
 
@@ -30,6 +36,8 @@ public class UIManager : MonoBehaviour {
     public Sprite emptyHeart;
 
     public GameObject gameOverPanel;
+    public Image HurtFlash;
+    private Color hurtColor;
 
     public static UIManager         instance;
 
@@ -49,13 +57,19 @@ public class UIManager : MonoBehaviour {
         //Initialize
         scoreText.text = GameController.playerScore.ToString();
         scoreText.enabled = false;
+
+        hurtColor = HurtFlash.color;
+        hurtColor.a = 1.0f;
     }
 
     void Update () {
+        //flash red when injured
+        HurtFlash.color = Color.Lerp(HurtFlash.color, Color.clear, 2*Time.deltaTime);
+
         //player health ui
         for (int i = 0; i < hearts.Length; i++)
         {
-            if (i < PlayerController.CurrentHealth())
+            if (i < PlayerController.GetCurrentHealth())
             {
                 hearts[i].GetComponent<Image>().color = new Color(1, 0, 0);
             }
@@ -64,7 +78,7 @@ public class UIManager : MonoBehaviour {
                 hearts[i].GetComponent<Image>().color = new Color(1, 0, 0, 0);
             }
 
-            if (i < PlayerController.MaximumHealth())
+            if (i < PlayerController.GetMaximumHealth())
             {
                 hearts[i].enabled = true;
                 emptyHearts[i].enabled = true;
@@ -90,6 +104,11 @@ public class UIManager : MonoBehaviour {
         //score UI
         scoreText.text = GameController.playerScore.ToString();
         UpdateCoinCountUI();
+
+        //consumables/resources
+        hookCount.text = FormatInteger(PlayerController.GetHookCount());
+        logCount.text = FormatInteger(PlayerController.GetLogCount());
+
     }
 
     private void UpdateCoinCountUI()
@@ -99,10 +118,11 @@ public class UIManager : MonoBehaviour {
         goldFront.fillAmount = GameController.coinProgress.z / GameController.coinThresholds.z;
         platinumFront.fillAmount = GameController.coinProgress.w / GameController.coinThresholds.w;
 
-        copperCount.text = GameController.playerCoins.x.ToString();
-        silverCount.text = GameController.playerCoins.y.ToString();
-        goldCount.text = GameController.playerCoins.z.ToString();
-        platinumCount.text = GameController.playerCoins.w.ToString();
+        copperCount.text = FormatInteger((int)GameController.playerCoins.x);
+        silverCount.text = FormatInteger((int)GameController.playerCoins.y);
+        goldCount.text = FormatInteger((int)GameController.playerCoins.z);
+        platinumCount.text = FormatInteger((int)GameController.playerCoins.w);
+        
     }
 
     public void ToggleGameOverScreen(bool isActive)
@@ -110,4 +130,21 @@ public class UIManager : MonoBehaviour {
         gameOverPanel.gameObject.SetActive(isActive);
     }
 
+    //Utility function, turns 5 into 05, 2 into 02, etc.
+    private string FormatInteger(int n)
+    {
+        if (n < 10)
+        {
+            return "0" + n.ToString();
+        }
+        else
+        {
+            return n.ToString();
+        }
+    }
+
+    public void GotHurt()
+    {
+        HurtFlash.color = hurtColor;
+    }
 }

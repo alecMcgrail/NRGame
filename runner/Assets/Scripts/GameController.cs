@@ -32,6 +32,7 @@ public class GameController : MonoBehaviour {
     private static ParticleManager      pMan;
 
     public CinemachineVirtualCamera     vCam;
+    public GameObject                   camFollowPoint;
     public static GameController        instance;
 
     private void Awake()
@@ -59,27 +60,30 @@ public class GameController : MonoBehaviour {
 
     private void FixedUpdate()
     {
-
+        //Debug.DrawLine(new Vector3(playerCon.transform.position.x, PlatformGenerator.currentPlatform.transform.position.y - 8, 0), new Vector3(playerCon.transform.position.x + 15, PlatformGenerator.currentPlatform.transform.position.y - 8, 0), Color.red);
+        
         //Did the Player fall or hit a wall?
-        if (playerCon.transform.position.y < platformGen.AvgPlatformHeight() - 25 ||
+        if (playerCon.transform.position.y < PlatformGenerator.currentPlatform.transform.position.y - 10 ||
             playerCon.hitWall)
         {
-            if (speedMultiplier - 0.03f > 1.0f)
+            //Falling-- does the Player have any grapple hooks?
+            if (PlayerController.GetHookCount() > 0 && !playerCon.isHooking)
             {
-                SetSpeedMultiplier(speedMultiplier - 0.03f);
+                Debug.Log("use hook");
+                StartCoroutine(playerCon.HookToCoroutine(PlatformGenerator.nextPlatform.perfZone.transform.position + new Vector3(0, 2, 0)));
+                PlayerController.SetHookCount(PlayerController.GetHookCount() - 1);
             }
             else
             {
-                SetSpeedMultiplier(1.0f);
+                //The Player loses all their health; the game is over!     
+                playerCon.TakeDamage(PlayerController.GetCurrentHealth());
             }
-
-            playerCon.TakeDamage(PlayerController.CurrentHealth());
-            //SpawnPlayer();
             
         }
-        else if (playerCon.hitObstacle)
+        else if (playerCon.hitObstacle && PlayerController.invulnValue <= 0)
         {
             pMan.PlayEffect("HitRedSquare", playerCon.transform.position);
+            UIMan.GotHurt();
             playerCon.TakeDamage(1);
             playerCon.hitObstacle = false;
             SetSpeedMultiplier(speedMultiplier - 0.1f);
@@ -92,7 +96,7 @@ public class GameController : MonoBehaviour {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex );
         }
 
-        if (PlayerController.CurrentHealth() <= 0)
+        if (PlayerController.GetCurrentHealth() <= 0)
         {
             ToggleGameOver();
         }
@@ -101,8 +105,14 @@ public class GameController : MonoBehaviour {
 
         playerPos = playerCon.PlayerPosition();
 
+        //set camera follow point
+        if(PlayerController.GetCurrentHealth() > 0)
+        {
+            camFollowPoint.transform.position = playerPos + new Vector3(0, 0, -Mathf.Abs( playerPos.y - platformGen.AvgPlatformHeight()));
+        }
+
         //Freeze in place while respawn timer counts down
-        if(PlayerController.CurrentHealth() <= 0 || respawnTimerValue > 0.0f)
+        if(PlayerController.GetCurrentHealth() <= 0 || respawnTimerValue > 0.0f)
         { 
             respawnTimerValue -= Time.deltaTime;
         }

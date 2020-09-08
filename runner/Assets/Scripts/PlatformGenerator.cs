@@ -15,6 +15,7 @@ public class PlatformGenerator : MonoBehaviour {
     public GameObject       slideUnder;
     public GameObject       roofHouse;
     public GameObject       goal;
+    public GameObject       store;
 
     public Transform        generationPoint;
     public float            initialDistanceBetween;
@@ -78,7 +79,7 @@ public class PlatformGenerator : MonoBehaviour {
 
                 case ObstacleType.ROOF_HOUSE:
                     oBody = Instantiate(instance.roofHouse, parent.pos + new Vector2((position * singleWidth) + (singleWidth/2) - (parent.width / 2), 2), Quaternion.identity);
-                    oBody.transform.localScale = new Vector3(singleWidth, 1, 1);
+                    oBody.transform.localScale = new Vector3(singleWidth-1, 1, 1);
 
                     break;
 
@@ -185,6 +186,8 @@ public class PlatformGenerator : MonoBehaviour {
     }
 
     private List<Platform>              platforms = new List<Platform>();
+    public static GameObject            currentPlatform;
+    public static Platform              nextPlatform;
     public static PlatformGenerator     instance;
 
     private void Awake()
@@ -202,14 +205,19 @@ public class PlatformGenerator : MonoBehaviour {
     void Start () {
         //Initialize, add starting platform
         platforms.Add(new Platform(new Vector2(6, -1), PlatformType.SS_BASIC_XL));
+        currentPlatform = platforms[0].pGround.gameObject;
         transform.position = new Vector2(platforms[0].pos.x, transform.position.y);
     }
 
     void Update () {
-        if(transform.position.x < generationPoint.position.x && platformsThisLevel < stageLength)
+        if (currentPlatform != null)
+        {
+            currentPlatform.GetComponent<Renderer>().material.color = new Color(0, 1, 0);
+        }
+
+        if (transform.position.x < generationPoint.position.x && platformsThisLevel < stageLength)
         {
             Platform lastPlat = platforms[platforms.Count - 1];
-
             PlatformType t = (PlatformType)Random.Range(0, System.Enum.GetValues(typeof(PlatformType)).Length);
 
             float newWidth = GetWidthOfType(t);
@@ -220,6 +228,7 @@ public class PlatformGenerator : MonoBehaviour {
             transform.position = new Vector2(transform.position.x + (lastPlat.width/2) + newWidth/2 + newDistBetween, newHeight);
 
             platforms.Add(new Platform(transform.position, t));
+            nextPlatform = platforms[platforms.Count - 2];
             platformsThisLevel += 1;
 
             if (platformsThisLevel >= stageLength)
@@ -227,8 +236,14 @@ public class PlatformGenerator : MonoBehaviour {
                 //spawn the exit
                 Instantiate(instance.goal, platforms[platforms.Count - 1].pos + new Vector2(0, 1), Quaternion.identity);
             }
+            else if (platformsThisLevel == Mathf.Floor(stageLength / 2))
+            {
+                //spawn the store
+                Instantiate(instance.store, platforms[platforms.Count - 1].pos + new Vector2(0, 2.5f), Quaternion.identity);
+            }
             else
             {
+                //for each obstacle slot on top of the new platform
                 for(int i=1; i < platforms[platforms.Count - 1].width / singleWidth; i++)
                 {
                     int rn = Random.Range(1, 100);
@@ -253,7 +268,7 @@ public class PlatformGenerator : MonoBehaviour {
         }
 
         //Clean up old platforms
-        if (platforms.Count > 15)
+        if (platforms.Count > 10)
         {
             Platform toDestroy = platforms[0];
             foreach (Obstacle h in toDestroy.hazards)
